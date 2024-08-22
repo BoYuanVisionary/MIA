@@ -1,0 +1,17 @@
+{
+    "perturb": {
+        "prob": [0.2, 0.8],
+        "perturbations": [5, 10],
+        "length": [32, 64],
+        "target": ["all", "keyword"],
+        "direction": ["add", "delete"]
+    },
+    "mink_ppl": {
+        "length": [32, 64],
+        "k_fraction": [0.2, 0.8]
+    },
+    "mink_entropy": {
+        "length": [32, 64],
+        "k_fraction": [0.2, 0.8]
+    }
+}

@@ -1,0 +1,10 @@
+{
+    "maxk_ppl": {
+        "length": [32, 64],
+        "k_fraction": [0.2, 0.5, 0.8]
+    },
+    "maxk_entropy": {
+        "length": [32, 64],
+        "k_fraction": [0.2, 0.5, 0.8]
+    }
+}
