@@ -10,15 +10,11 @@ import matplotlib.pyplot as plt
 import argparse
 
 def generate_unique_string(method, **kwargs):
-    # Sort the kwargs to ensure consistent ordering
+    
     sorted_params = sorted(kwargs.items())
-
-    # Create a string representation of the parameters
     params_str = '|'.join([f"{key}={value}" for key, value in sorted_params])
-
-    # Concatenate the method name and the parameters string
     unique_string = f"{method}|{params_str}"
-
+    
     return unique_string
 
 def run_experiment(method, tokenizer, model, device, **kwargs):
@@ -27,7 +23,7 @@ def run_experiment(method, tokenizer, model, device, **kwargs):
     """
     length = kwargs['length']
 
-    # move this when the datasize is large
+    # move this when the dataset is large
     dataset = load_dataset("swj0419/WikiMIA", split=f"WikiMIA_length{length}")
 
     metric = metrics.metric(method, tokenizer, model, device, **kwargs)
@@ -53,14 +49,16 @@ def run_experiment(method, tokenizer, model, device, **kwargs):
 
     setting = generate_unique_string(method, **kwargs)
     print(setting)
-
-    filename_base = './ablation/' + setting
+    folder_path = './ablation/'
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+        print(f"Folder '{folder_path}' created.")
+    filename_base = folder_path + setting
 
     np.save(filename_base + '_unseen.npy', filtered_uncertainties_0)
     np.save(filename_base + '_seen.npy', filtered_uncertainties_1)
     
     measures = measures.numpy()
-    # print(measures)
     auc = roc_auc_score(labels, -measures)
     print(f"AUC:{auc}")
 
@@ -82,10 +80,10 @@ def main(config_path, device_id):
     device = f'cuda:{device_id}' if device_id >= 0 else 'cpu'
     model_name = "huggyllama/llama-13b"
     tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForCausalLM.from_pretrained(model_name, device_map=device, torch_dtype=torch.float16)
+    # To load model on multiple gpu, set device_map = 'auto', for more control, use max_memory. For instance, max_memory={0: "10GiB", 1: "10GiB", "cpu": "30GiB"}
+    model = AutoModelForCausalLM.from_pretrained(model_name, device_map=device, torch_dtype=torch.bfloat16)
     model.eval()
     
-
     for method, config_options in config_methods.items():
         keys, values = zip(*config_options.items())
         experiments = [dict(zip(keys, v)) for v in itertools.product(*values)]
@@ -101,10 +99,8 @@ if __name__ == "__main__":
     parser.add_argument('--config_path', type=str, help='Path to the configuration file for the experiment.')
     args = parser.parse_args()
     
-    
     # Specify the GPU device
     device = args.device
-
     # config_path = "/path/to/your/experiment_config.json"  # Adjust this path to your configuration file
     config_path  = args.config_path
 
