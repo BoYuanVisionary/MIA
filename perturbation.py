@@ -1,4 +1,5 @@
 import numpy as np
+import re
 from utils import rake_keyword
 
 def perturb_text_add(text, add_prob):
@@ -9,7 +10,6 @@ def perturb_text_add(text, add_prob):
         if np.random.rand() < add_prob:
             perturbed_words.append(word)
     return ' '.join(perturbed_words)
-
 
 def perturb_text_delete(text, delete_prob):
     words = text.split()
@@ -28,10 +28,12 @@ def perturb_text_delete(text, delete_prob):
 #             perturbed_words.append(word)
 #     return ' '.join(perturbed_words)
 
-# This may have a bug
+# only perturb non-keyword tokens in the following two ones. 
+# note that 1. the keywords are extracted by rake_keyword 2. be careful of text = re.sub(r'[^\w\s]', '', text)
 def perturb_token_keywords_add(text, add_prob):
-    # Delete_prob is the probability to remove non-essential words. All the keywords will be fixed. 
+    # add_prob is the probability to remove non-essential words. All the keywords will be fixed. 
     keywords = rake_keyword(text)
+    text = re.sub(r'[^\w\s]', '', text) # remove all punctuation
     low_words = text.lower().split()
     words = text.split()
     perturbed_words = []
@@ -41,7 +43,7 @@ def perturb_token_keywords_add(text, add_prob):
         for keyword in keywords:
             start = index
             end = index + len(keyword.split())
-            if end < len(low_words) and ' '.join(low_words[start:end]) == keyword:
+            if end <= len(low_words) and ' '.join(low_words[start:end]) == keyword:
                 index += len(keyword.split())
                 perturbed_words.append(' '.join(words[start:end]))
                 break
@@ -54,9 +56,10 @@ def perturb_token_keywords_add(text, add_prob):
     
     
 def perturb_token_keywords_delete(text, delete_prob):
-    # Delete_prob is the probability to remove non-essential words. All the keywords will be fixed. 
+    # delete_prob is the probability to remove non-essential words. All the keywords will be fixed. 
     keywords = rake_keyword(text)
-    low_words = text.lower().split()
+    text = re.sub(r'[^\w\s]', '', text) # remove all punctuations
+    low_words = text.lower().split()  
     words = text.split()
     perturbed_words = []
     index = 0
@@ -65,7 +68,7 @@ def perturb_token_keywords_delete(text, delete_prob):
         for keyword in keywords:
             start = index
             end = index + len(keyword.split())
-            if end < len(low_words) and ' '.join(low_words[start:end]) == keyword:
+            if end <= len(low_words) and ' '.join(low_words[start:end]) == keyword:
                 index += len(keyword.split())
                 perturbed_words.append(' '.join(words[start:end]))
                 break
