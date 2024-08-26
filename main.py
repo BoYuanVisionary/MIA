@@ -8,6 +8,7 @@ import numpy as np
 from sklearn.metrics import roc_auc_score
 import matplotlib.pyplot as plt
 import argparse
+import os
 
 def generate_unique_string(method, **kwargs):
     
@@ -78,10 +79,10 @@ def main(config_path, device_id):
         config_methods = json.load(file)
 
     device = f'cuda:{device_id}' if device_id >= 0 else 'cpu'
-    model_name = "huggyllama/llama-13b"
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    # To load model on multiple gpu, set device_map = 'auto', for more control, use max_memory. For instance, max_memory={0: "10GiB", 1: "10GiB", "cpu": "30GiB"}
-    model = AutoModelForCausalLM.from_pretrained(model_name, device_map=device, torch_dtype=torch.bfloat16)
+    model_path = "huggyllama/llama-13b" # change this accordingly
+    tokenizer = AutoTokenizer.from_pretrained(model_path)
+    # To load model on multiple gpus, set device_map = 'auto', for more control, use max_memory. For instance, max_memory={0: "10GiB", 1: "10GiB", "cpu": "30GiB"}
+    model = AutoModelForCausalLM.from_pretrained(model_path, device_map=device, torch_dtype=torch.bfloat16)
     model.eval()
     
     for method, config_options in config_methods.items():

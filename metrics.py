@@ -174,7 +174,7 @@ class metric:
     # to do: add keyword_entropy
     def mink_keyword_entropy(self, input_text):
         raise NotImplementedError
-        # to do: add keyword_entropy
+    # to do: add keyword_entropy
     def maxk_keyword_entropy(self, input_text):
         raise NotImplementedError
     
