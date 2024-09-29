@@ -80,3 +80,4 @@ def generate_batches(data, batch_size):
     for i in range(0, num_samples, batch_size):
         batch = [d[i:i + batch_size] for d in data] # Python's list slicing mechanism does not raise an error when the end index is out of bounds
         yield batch
+        
