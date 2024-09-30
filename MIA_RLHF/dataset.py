@@ -5,9 +5,10 @@ from datasets import load_dataset
 model_id = "meta-llama/Llama-3.2-1B-Instruct" # replace with your model id
 tokenizer = AutoTokenizer.from_pretrained(model_id)
 
-# Load dataset from the hub
+# Load dataset from the hub (60917)
 dataset = load_dataset("argilla/ultrafeedback-binarized-preferences-cleaned", split="train")
-dataset = dataset.shuffle().select(range(13750))
+# target for all samples 
+dataset = dataset.shuffle()
 
 def rec_extract_assistant_messages(messages, index=-1):
     """Recursively extract the last assistant messages from the end of the conversation."""
@@ -38,8 +39,8 @@ def create_triplets(example, tokenizer, default_system_message=DEFAULT_SYSTEM_ME
     }
 
 dataset = dataset.map(create_triplets, remove_columns=dataset.features, fn_kwargs={"tokenizer": tokenizer})
-# split dataset into 11,000 training samples and 2,750 test samples
-dataset = dataset.train_test_split(test_size=2750/13750)
+# split dataset into 57,917 training samples and 3,000 test samples
+dataset = dataset.train_test_split(test_size=3000/60917)
 
 # print sample cut of
 print(dataset["train"][0]["prompt"][:50])
@@ -49,3 +50,5 @@ print(dataset["train"][0]["rejected"][:50])
 # save datasets to disk
 dataset["train"].to_json("train_dataset.json", orient="records")
 dataset["test"].to_json("test_dataset.json", orient="records")
+
+
